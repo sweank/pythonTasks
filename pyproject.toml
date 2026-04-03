@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "shikaku-solver"
+version = "1.1.0"
+description = "Console and GUI Shikaku puzzle solver with 2D, 3D, generator and CI"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [
+  { name = "Student project template" }
+]
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0",
+  "pytest-cov>=5.0",
+]
+
+[project.scripts]
+shikaku = "shikaku.cli:main"
+shikaku-ui = "shikaku.gui:main"
+
+[tool.pytest.ini_options]
+addopts = "--cov=shikaku --cov-report=term-missing --cov-fail-under=80"
+testpaths = ["tests"]
+
+[tool.setuptools]
+packages = ["shikaku"]
+
+
+[tool.coverage.run]
+omit = [
+  "shikaku/gui.py",
+  "shikaku/__main__.py",
+]
