@@ -11,6 +11,7 @@ from __future__ import annotations
 import random
 
 from .formatter3d import format_puzzle_3d
+from .limits import validate_2d_dimensions, validate_3d_dimensions
 from .models import Puzzle
 from .models3d import Puzzle3D
 
@@ -57,8 +58,7 @@ def _box_splits(box: Box) -> list[tuple[Box, Box]]:
 
 
 def generate_puzzle(rows: int, cols: int, seed: int | None = None, max_regions: int | None = None) -> Puzzle:
-    if rows <= 0 or cols <= 0:
-        raise ValueError("rows and cols must be positive")
+    validate_2d_dimensions(rows, cols)
 
     rng = random.Random(seed)
     target = max_regions if max_regions is not None else max(1, min(rows * cols, max(2, (rows * cols) // 2)))
@@ -90,8 +90,7 @@ def generate_puzzle_3d(
     seed: int | None = None,
     max_regions: int | None = None,
 ) -> Puzzle3D:
-    if depth <= 0 or rows <= 0 or cols <= 0:
-        raise ValueError("depth, rows and cols must be positive")
+    validate_3d_dimensions(depth, rows, cols)
 
     rng = random.Random(seed)
     volume = depth * rows * cols

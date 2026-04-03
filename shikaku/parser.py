@@ -20,6 +20,7 @@ from pathlib import Path
 from typing import Iterable, Optional
 
 from .errors import InputFormatError
+from .limits import validate_2d_dimensions
 from .models import Puzzle
 
 
@@ -46,8 +47,7 @@ def _parse_dimensions(line: str) -> tuple[int, int]:
         rows, cols = (int(parts[0]), int(parts[1]))
     except ValueError as exc:
         raise InputFormatError("Размеры поля должны быть целыми числами.") from exc
-    if rows <= 0 or cols <= 0:
-        raise InputFormatError("Размеры поля должны быть положительными.")
+    validate_2d_dimensions(rows, cols, InputFormatError)
     return rows, cols
 
 

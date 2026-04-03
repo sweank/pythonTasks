@@ -105,7 +105,7 @@ def run(argv: list[str] | None = None) -> int:
     if args.generate:
         try:
             rendered = _render_generated(args)
-        except (InputFormatError, ShikakuError) as exc:
+        except (InputFormatError, ShikakuError, ValueError) as exc:
             rendered = f"STATUS: ERROR\nMESSAGE: {exc}"
             if args.output:
                 Path(args.output).write_text(rendered + "\n", encoding="utf-8")

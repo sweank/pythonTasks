@@ -20,6 +20,7 @@ from pathlib import Path
 from typing import Optional
 
 from .errors import InputFormatError
+from .limits import validate_3d_dimensions
 from .parser import EMPTY_TOKENS, _parse_token
 from .models3d import Puzzle3D
 
@@ -49,8 +50,7 @@ def _parse_dimensions(line: str) -> tuple[int, int, int]:
         depth, rows, cols = (int(parts[0]), int(parts[1]), int(parts[2]))
     except ValueError as exc:
         raise InputFormatError("Размеры 3D-поля должны быть целыми числами.") from exc
-    if depth <= 0 or rows <= 0 or cols <= 0:
-        raise InputFormatError("Размеры 3D-поля должны быть положительными.")
+    validate_3d_dimensions(depth, rows, cols, InputFormatError)
     return depth, rows, cols
 
 
