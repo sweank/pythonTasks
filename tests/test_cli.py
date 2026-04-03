@@ -38,6 +38,7 @@ def test_cli_can_write_to_output_file(tmp_path: Path) -> None:
 
     assert exit_code == 0
     assert "STATUS: SOLVED" in output_file.read_text(encoding="utf-8")
+<<<<<<< HEAD
 
 
 def test_cli_solves_3d_file(tmp_path: Path, capsys) -> None:
@@ -65,3 +66,5 @@ def test_cli_generates_3d_puzzle(capsys) -> None:
 
     assert exit_code == 0
     assert "2 2 2" in captured.out
+=======
+>>>>>>> b0a1721887184d2ff4b45bd8b39310827a9f917d
