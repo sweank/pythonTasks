@@ -1,89 +1,27 @@
 # Shikaku Solver
 
-Небольшой учебный проект на Python для решения головоломки **Shikaku**.
+Console and minimal GUI implementation of the Shikaku puzzle.
 
-## Автор's
+## Features
 
-Батраев Даниэль, Шагапов Владимир
+- 2D Shikaku solver
+- 3D Shikaku solver (minimal cuboid-based extension)
+- random puzzle generator for 2D and 3D
+- basic Tkinter UI for manual solving, checking and generation
+- unit tests and GitHub Actions CI
 
-## Название задачи
-
-Реализация головоломки Shikaku.
-
-## Назначение программы
-
-Программа читает задачу Shikaku из файла или стандартного ввода, проверяет корректность формата, ищет решение и выводит результат в текстовом виде. Поддерживается пакетный запуск сразу для нескольких файлов.
-
-## Что умеет программа
-
-- решает корректные задачи Shikaku;
-- сообщает, если решения не существует;
-- сообщает понятную ошибку, если входной файл некорректен;
-- запускается из консоли и подходит для пакетной обработки;
-- имеет модульные тесты и CI-проверку для GitHub.
-
-## Правила головоломки
-
-Поле нужно разбить на прямоугольники так, чтобы:
-
-- каждый прямоугольник содержал ровно одно число;
-- площадь прямоугольника была равна этому числу;
-- прямоугольники не пересекались;
-- все клетки поля были покрыты.
-
-## Архитектура проекта
-
-```text
-shikaku_project/
-├── .github/workflows/ci.yml   # GitHub Actions: тесты и покрытие
-├── examples/                  # примеры входных файлов
-├── shikaku/
-│   ├── __init__.py
-│   ├── __main__.py            # запуск через python -m shikaku
-│   ├── cli.py                 # командный интерфейс
-│   ├── errors.py              # пользовательские исключения
-│   ├── formatter.py           # форматирование вывода
-│   ├── models.py              # модели поля, числа, прямоугольника, решения
-│   ├── parser.py              # чтение и проверка входных данных
-│   ├── solver.py              # генерация кандидатов и backtracking-решатель
-│   └── verifier.py            # проверка корректности найденного решения
-├── tests/                     # unit-тесты
-├── pyproject.toml             # зависимости, pytest, coverage
-├── README.md
-├── readme.txt
-└── requirements-dev.txt
-```
-
-Логика решения отделена от CLI:
-
-- `solver.py`, `parser.py`, `verifier.py` не импортируют `cli.py`;
-- `cli.py` только разбирает аргументы, вызывает доменную логику и печатает результат.
-
-## Формат входных данных
-
-Формат одного файла:
+## 2D input format
 
 ```text
 <rows> <cols>
-<row_1>
-<row_2>
+<row 1>
 ...
-<row_rows>
+<row N>
 ```
 
-Где:
+Empty cells: `.`, `0`, `_`
 
-- `rows`, `cols` — размеры поля;
-- в строках поля указывается ровно `cols` значений через пробел;
-- `.` или `0` или `_` — пустая клетка;
-- положительное целое число — клетка с подсказкой.
-
-Дополнительно:
-
-- пустые строки игнорируются;
-- строки, начинающиеся с `#`, считаются комментариями.
-
-### Пример входа
+Example:
 
 ```text
 3 3
@@ -92,111 +30,77 @@ shikaku_project/
 . . 3
 ```
 
-## Формат вывода
-
-### Если решение найдено
+## 3D input format
 
 ```text
-FILE: examples/solvable_3x3.txt
-STATUS: SOLVED
-BOARD:
-A A A
-B B B
-C C C
-REGIONS:
-A: rows 1-1, cols 1-3, area 3, clue 3 at (1, 1)
-B: rows 2-2, cols 1-3, area 3, clue 3 at (2, 2)
-C: rows 3-3, cols 1-3, area 3, clue 3 at (3, 3)
+<depth> <rows> <cols>
+<layer 1 row 1>
+...
+<layer 1 row N>
+---
+<layer 2 row 1>
+...
 ```
 
-### Если решения нет
+Separator `---` is optional.
+
+Example:
 
 ```text
-STATUS: NO_SOLUTION
+2 2 2
+4 .
+. .
+---
+4 .
+. .
 ```
 
-### Если вход некорректен
+## CLI usage
 
-```text
-STATUS: ERROR
-MESSAGE: <понятное описание ошибки>
-```
-
-## Ключи запуска
-
-```text
-python -m shikaku [INPUT ...] [-o OUTPUT] [--debug]
-```
-
-Поддерживаемые аргументы:
-
-- `INPUT` — один или несколько входных файлов;
-- `-` вместо имени файла — чтение из `stdin`;
-- `-o`, `--output` — записать результат в файл;
-- `-h`, `--help` — справка;
-- `--debug` — показывает traceback только для отладки.
-
-## Примеры использования
-
-### 1. Решить одну задачу
+Solve 2D puzzle:
 
 ```bash
-python -m shikaku examples/solvable_2x2.txt
+python -m shikaku puzzle.txt
 ```
 
-### 2. Пакетная обработка нескольких задач
+Solve 3D puzzle:
 
 ```bash
-python -m shikaku examples/solvable_2x2.txt examples/solvable_3x3.txt examples/unsolvable_2x2.txt
+python -m shikaku --mode 3d puzzle3d.txt
 ```
 
-### 3. Записать результат в файл
+Generate 2D puzzle:
 
 ```bash
-python -m shikaku examples/solvable_3x3.txt -o result.txt
+python -m shikaku --generate --rows 4 --cols 4 --seed 1
 ```
 
-### 4. Прочитать задачу из стандартного ввода
+Generate 3D puzzle:
 
 ```bash
-cat examples/solvable_2x2.txt | python -m shikaku -
+python -m shikaku --generate --mode 3d --depth 2 --rows 3 --cols 3 --seed 1
 ```
 
-## Алгоритм решения
-
-1. Парсер проверяет формат входа.
-2. Для каждой числовой клетки строятся все допустимые прямоугольники нужной площади.
-3. Прямоугольник отбрасывается, если он содержит другое число.
-4. Далее выполняется поиск с возвратом (backtracking):
-   - выбирается число с наименьшим количеством оставшихся кандидатов;
-   - пробуется очередной прямоугольник;
-   - состояние дополнительно проверяется на выполнимость;
-   - при конфликте выполняется откат.
-5. После нахождения набора прямоугольников решение отдельно проверяется модулем `verifier.py`.
-
-## Тестирование
-
-Запуск тестов:
+Run GUI for manual solving:
 
 ```bash
-pytest
+python -m shikaku --gui
 ```
 
-Тесты проверяют:
+## Architecture
 
-- корректный парсинг;
-- ошибки формата;
-- поиск решения;
-- неразрешимые случаи;
-- проверку решений;
-- CLI без сырого traceback.
+- `shikaku/models.py` - 2D models
+- `shikaku/models3d.py` - 3D models
+- `shikaku/parser.py` / `parser3d.py` - input parsing
+- `shikaku/solver.py` / `solver3d.py` - backtracking solvers
+- `shikaku/verifier.py` / `verifier3d.py` - result validation
+- `shikaku/generator.py` - minimal puzzle generation
+- `shikaku/gui.py` - minimal Tkinter interface for manual solving
+- `tests/` - unit tests
 
-Порог покрытия строк установлен в `pyproject.toml`:
+## Notes
 
-```text
---cov-fail-under=80
-```
-
-## GitHub Actions
-
-После загрузки проекта на GitHub workflow из `.github/workflows/ci.yml` автоматически запускает тесты при `push` и `pull_request`.
+- The 3D version is intentionally minimal: the puzzle is split into cuboids instead of rectangles.
+- The generator aims for simplicity, not for guaranteed uniqueness of the solution.
+- In the GUI, the user solves puzzles manually: 2D by selecting rectangle corners, 3D by entering cuboid coordinates and checking the result.
+- Replace the author placeholder in project metadata before final submission.
